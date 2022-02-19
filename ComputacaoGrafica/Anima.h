@@ -24,7 +24,7 @@ GLfloat windowWidth = 400;
 GLfloat windowHeight = 350;
 
 // Função callback chamada para fazer o desenho
-void Desenha(void)
+void Display(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -80,14 +80,14 @@ void Timer(int value)
 }
 
 // Inicializa parâmetros de rendering
-void Inicializa(void)
+void Initialize(void)
 {
     // Define a cor de fundo da janela de visualização como preta
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 // Função callback chamada quando o tamanho da janela é alterado 
-void FuncaoRedesenho(GLsizei w, GLsizei h)
+void Redisplay(GLsizei w, GLsizei h)
 {
     // Evita a divisao por zero
     if (h == 0) h = 1;
@@ -119,10 +119,10 @@ int Anima(void)
     glutInitWindowSize(400, 350);
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Anima");
-    glutDisplayFunc(Desenha);
-    glutReshapeFunc(FuncaoRedesenho);
+    glutDisplayFunc(Display);
+    glutReshapeFunc(Redisplay);
     glutTimerFunc(33, Timer, 1);
-    Inicializa();
+    Initialize();
     glutMainLoop();
 
     return 0;

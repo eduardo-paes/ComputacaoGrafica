@@ -11,7 +11,7 @@ GLfloat xf, yf, win;
 GLint view_w, view_h;
 
 // Função callback chamada para fazer o desenho
-void Desenha(void)
+void Display(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -28,7 +28,7 @@ void Desenha(void)
 }
 
 // Inicializa parâmetros de rendering
-void Inicializa(void)
+void Initialize(void)
 {
     // Define a cor de fundo da janela de visualização como preta
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -38,7 +38,7 @@ void Inicializa(void)
 }
 
 // Função callback chamada quando o tamanho da janela é alterado 
-void FuncaoRedesenho(GLsizei w, GLsizei h)
+void Redisplay(GLsizei w, GLsizei h)
 {
     // Especifica as dimensões da Viewport
     glViewport(0, 0, w, h);
@@ -52,7 +52,7 @@ void FuncaoRedesenho(GLsizei w, GLsizei h)
 }
 
 // Função callback chamada para gerenciar eventos de teclado
-void GerenciaTeclado(unsigned char key, int x, int y)
+void KeyboardController(unsigned char key, int x, int y)
 {
     switch (key) {
     case 'R':
@@ -72,7 +72,7 @@ void GerenciaTeclado(unsigned char key, int x, int y)
 }
 
 // Função callback chamada para gerenciar eventos do mouse
-void GerenciaMouse(int button, int state, int x, int y)
+void MouseController(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON)
         if (state == GLUT_DOWN) {
@@ -110,12 +110,12 @@ int Interacao(void)
     glutInitWindowSize(350, 300);
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Exemplo de Interacao");
-    glutDisplayFunc(Desenha);
-    glutReshapeFunc(FuncaoRedesenho);
-    glutKeyboardFunc(GerenciaTeclado);
-    glutMouseFunc(GerenciaMouse);
+    glutDisplayFunc(Display);
+    glutReshapeFunc(Redisplay);
+    glutKeyboardFunc(KeyboardController);
+    glutMouseFunc(MouseController);
     glutSpecialFunc(TeclasEspeciais);
-    Inicializa();
+    Initialize();
     glutMainLoop();
 
     return 0;

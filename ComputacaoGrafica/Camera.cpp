@@ -21,3 +21,27 @@ void Camera::Print() {
 	printf("centerX: %f | centerY: %f | centerZ: %f\n", this->centerX, this->centerY, this->centerZ);
 	printf("upX: %f | upY: %f | upZ: %f\n\n---\n", this->upX, this->upY, this->upZ);
 }
+
+void Camera::MoveForward() {
+	this->eyeY += 5;
+	this->eyeZ += 5;
+	this->centerY += 5;
+	this->centerZ += 5;
+}
+
+void Camera::MoveBack() {
+	this->eyeY -= 5;
+	this->eyeZ -= 5;
+	this->centerY -= 5;
+	this->centerZ -= 5;
+}
+
+void Camera::MoveRight() {
+	this->eyeX += 5;
+	this->centerX += 5;
+}
+
+void Camera::MoveLeft() {
+	this->eyeX -= 5;
+	this->centerX -= 5;
+}

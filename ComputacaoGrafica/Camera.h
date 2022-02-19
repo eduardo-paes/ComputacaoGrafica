@@ -22,6 +22,10 @@ public:
 		   GLdouble upX, GLdouble upY, GLdouble upZ);
 
 	void Print();
+	void MoveForward();
+	void MoveBack();
+	void MoveRight();
+	void MoveLeft();
 };
 
 #endif

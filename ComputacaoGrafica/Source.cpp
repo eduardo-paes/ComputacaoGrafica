@@ -1,6 +1,6 @@
-#include "MultiViewport.h"
+#include "Game.h"
 
-int main(void)
+int main(int argc, char** argv)
 {
-    return MultiViewport();
+    return Game(argc, argv);
 }

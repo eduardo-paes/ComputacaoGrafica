@@ -1,67 +1,84 @@
 #pragma region Importações
+
 #include <gl/glut.h>
 #include "Camera.h"
+#include "Model.h"
+
 #pragma endregion
 
 #pragma region Escopo Global
+
 GLfloat angle, fAspect;
 GLfloat r = 0, g = 0, b = 1;
 GLsizei width = 600, height = 600;
+int POS_X, POS_Y;
 
 // Parâmetros de câmera
-Camera cam1 = Camera(0, 80, 200, 0, 0, 0, 0, 1, 0);
-Camera cam2 = Camera(0, -80, 200, 0, 0, 0, 0, 1, 0);
-Camera cam3 = Camera(0, -115, 5, 0, 195, 0, 0, 1, 0);
+Camera mainCamera = Camera(0, 80, 200, 0, 0, 0, 0, 1, 0);
+Camera backCamera = Camera(0, -80, 200, 0, 0, 0, 0, 1, 0);
+Camera mapCamera = Camera(0, -115, 5, 0, 195, 0, 0, 1, 0);
+
+// Filepaths
+const char* CubeFile = "./Models/Cube.obj";
+
+// Object Models
+Model cube;
+
 #pragma endregion
 
 #pragma region Assinaturas
-void EspecificaParametrosVisualizacao();
+
+void EspecifyDisplayParameters();
 void DefineCamera(GLsizei iniW, GLsizei iniH, GLsizei sizeW, GLsizei sizeH, Camera cam);
-void CameraPrincipal();
-void CameraRetrovisor();
-void CameraMapa();
+void MainCamera();
+void BackCamera();
+void MapCamera();
+void ScrollController(int, int, int, int);
+
 #pragma endregion
 
 /// <summary>
 /// Função callback chamada para fazer o desenho.
 /// </summary>
-void Desenha(void)
+void Display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Desenho dos cenários
-	CameraPrincipal();
-	CameraRetrovisor();
-	CameraMapa();
+	MainCamera();
+	BackCamera();
+	MapCamera();
 
 	// Executa os comandos OpenGL
 	glutSwapBuffers();
 }
 
-void CameraPrincipal()
+void MainCamera()
 {
 	// Definição da viewport e câmera 1
-	DefineCamera(0, 0, width, height, cam1);
+	DefineCamera(0, 0, width, height, mainCamera);
 
 	// Desenha o teapot com a cor corrente (wire-frame)
-	glColor3f(r, g, b);
-	glutWireTeapot(50.0f);
+	/*glColor3f(r, g, b);
+	glutWireTeapot(50.0f);*/
+
+	cube.LoadModel(CubeFile);
 }
 
-void CameraRetrovisor()
+void BackCamera()
 {
 	// Definição da viewport e câmera 2
-	DefineCamera(0, 0, width / 8, height / 8, cam2);
+	DefineCamera(0, 0, width / 8, height / 8, backCamera);
 
 	// Desenha o teapot com a cor corrente (wire-frame)
 	glColor3f(0,1,0);
 	glutWireTeapot(50.0f);
 }
 
-void CameraMapa()
+void MapCamera()
 {
 	// Definição da viewport e câmera 3
-	DefineCamera(width - (width / 8), 0, width / 8, height / 8, cam3);
+	DefineCamera(width - (width / 8), 0, width / 8, height / 8, mapCamera);
 
 	// Desenha o teapot com a cor corrente (wire-frame)
 	glColor3f(1,0,0);
@@ -71,7 +88,7 @@ void CameraMapa()
 /// <summary>
 /// Inicializa parâmetros de rendering.
 /// </summary>
-void Inicializa(void)
+void Initialize(void)
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	angle = 90;
@@ -101,7 +118,7 @@ void DefineCamera(GLsizei iniW, GLsizei iniH, GLsizei sizeW, GLsizei sizeH, Came
 /// <summary>
 /// Função usada para especificar o volume de visualização.
 /// </summary>
-void EspecificaParametrosVisualizacao()
+void EspecifyDisplayParameters()
 {
 	// Especifica sistema de coordenadas de projeção
 	glMatrixMode(GL_PROJECTION);
@@ -124,7 +141,7 @@ void EspecificaParametrosVisualizacao()
 /// </summary>
 /// <param name="w">Width da chamada</param>
 /// <param name="h">Height da chamada</param>
-void FuncaoRedesenho(GLsizei w, GLsizei h)
+void Redisplay(GLsizei w, GLsizei h)
 {
 	// Para previnir uma divisão por zero
 	if (h == 0) h = 1;
@@ -136,7 +153,7 @@ void FuncaoRedesenho(GLsizei w, GLsizei h)
 	// Calcula a correção de aspecto
 	fAspect = (GLfloat)width / (GLfloat)height;
 
-	EspecificaParametrosVisualizacao();
+	EspecifyDisplayParameters();
 }
 
 /// <summary>
@@ -146,7 +163,7 @@ void FuncaoRedesenho(GLsizei w, GLsizei h)
 /// <param name="state"></param>
 /// <param name="x"></param>
 /// <param name="y"></param>
-void GerenciaMouse(int button, int state, int x, int y)
+void MouseController(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON)
 		if (state == GLUT_DOWN)  // Zoom-in
@@ -155,8 +172,20 @@ void GerenciaMouse(int button, int state, int x, int y)
 		if (state == GLUT_DOWN)  // Zoom-out
 			if (angle <= 130) angle += 5;
 
-	EspecificaParametrosVisualizacao();
+	EspecifyDisplayParameters();
 	glutPostRedisplay();
+}
+
+void ScrollController(int button, int dir, int x, int y)
+{
+	// Zoom in
+	if (dir > 0)
+		if (angle >= 10) angle -= 5;
+	// Zoom out
+	else
+		if (angle <= 130) angle += 5;
+
+	return;
 }
 
 /// <summary>
@@ -165,7 +194,7 @@ void GerenciaMouse(int button, int state, int x, int y)
 /// <param name="key"></param>
 /// <param name="x"></param>
 /// <param name="y"></param>
-void GerenciaTeclado(unsigned char key, int x, int y)
+void KeyboardController(unsigned char key, int x, int y)
 {
 	switch (key) {
 		// Muda a cor corrente para vermelho
@@ -192,37 +221,29 @@ void GerenciaTeclado(unsigned char key, int x, int y)
 		// Cima
 		case 'W':
 		case 'w':
-			cam1.eyeY += 5;
-			cam1.eyeZ += 5;
-			cam1.centerY += 5;
-			cam1.centerZ += 5;
+			mainCamera.MoveForward();
 			break;
 		// Baixo
 		case 'S':
 		case 's':
-			cam1.eyeY -= 5;
-			cam1.eyeZ -= 5;
-			cam1.centerY -= 5;
-			cam1.centerZ -= 5;
+			mainCamera.MoveBack();
 			break;
 		// Esquerda
 		case 'A':
 		case 'a':
-			cam1.eyeX -= 5;
-			cam1.centerX -= 5;
+			mainCamera.MoveLeft();
 			break;
 		// Direita
 		case 'D':
 		case 'd':
-			cam1.eyeX += 5;
-			cam1.centerX += 5;
+			mainCamera.MoveRight();
 			break;
 		// Reset
 		case ' ':
-			cam1 = Camera(0, 80, 200, 0, 0, 0, 0, 1, 0);
+			mainCamera = Camera(0, 80, 200, 0, 0, 0, 0, 1, 0);
 			break;
 	}
-	cam1.Print();
+	mainCamera.Print();
 	glutPostRedisplay();
 }
 
@@ -230,16 +251,27 @@ void GerenciaTeclado(unsigned char key, int x, int y)
 /// Programa Principal.
 /// </summary>
 /// <returns></returns>
-int MultiViewport(void)
+int Game(int argc, char** argv)
 {
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInit(&argc, argv);
+
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
+	glEnable(GLUT_MULTISAMPLE);
+	glHint(GLUT_MULTISAMPLE, GL_NICEST);
+	POS_X = (glutGet(GLUT_SCREEN_WIDTH) - width) >> 1;
+	POS_Y = (glutGet(GLUT_SCREEN_HEIGHT) - height) >> 1;
+	glutInitWindowPosition(POS_X, POS_Y);
+
 	glutInitWindowSize(width, height);
 	glutCreateWindow("Visualizacao 3D");
-	glutDisplayFunc(Desenha);
-	glutReshapeFunc(FuncaoRedesenho);
-	glutKeyboardFunc(GerenciaTeclado);
-	glutMouseFunc(GerenciaMouse);
-	Inicializa();
+
+	Initialize();
+
+	glutDisplayFunc(Display);
+	glutReshapeFunc(Redisplay);
+	glutKeyboardFunc(KeyboardController);
+	glutMouseFunc(MouseController);
 	glutMainLoop();
+
 	return 0;
 }
