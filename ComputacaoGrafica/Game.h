@@ -1,12 +1,11 @@
-#pragma region Importações
+#pragma region Imports
 
-#include <gl/glut.h>
 #include "Camera.h"
 #include "Model.h"
 
 #pragma endregion
 
-#pragma region Escopo Global
+#pragma region Global_Escope
 
 GLfloat angle, fAspect;
 GLfloat r = 0, g = 0, b = 1;
@@ -19,14 +18,14 @@ Camera backCamera = Camera(0, -80, 200, 0, 0, 0, 0, 1, 0);
 Camera mapCamera = Camera(0, -115, 5, 0, 195, 0, 0, 1, 0);
 
 // Filepaths
-const char* CubeFile = "./Models/Cube.obj";
+const char* CubeFile = "./Models/Car1.obj";
 
 // Object Models
 Model cube;
 
 #pragma endregion
 
-#pragma region Assinaturas
+#pragma region Assign_Methods
 
 void EspecifyDisplayParameters();
 void DefineCamera(GLsizei iniW, GLsizei iniH, GLsizei sizeW, GLsizei sizeH, Camera cam);
@@ -62,7 +61,11 @@ void MainCamera()
 	/*glColor3f(r, g, b);
 	glutWireTeapot(50.0f);*/
 
-	cube.LoadModel(CubeFile);
+	// Desenha o carro principal
+	if (cube.IsLoaded())
+		cube.DisplayModel();
+	else
+		cube.LoadFromFile(CubeFile);
 }
 
 void BackCamera()
@@ -141,7 +144,7 @@ void EspecifyDisplayParameters()
 /// </summary>
 /// <param name="w">Width da chamada</param>
 /// <param name="h">Height da chamada</param>
-void Redisplay(GLsizei w, GLsizei h)
+void ReDisplay(GLsizei w, GLsizei h)
 {
 	// Para previnir uma divisão por zero
 	if (h == 0) h = 1;
@@ -268,7 +271,7 @@ int Game(int argc, char** argv)
 	Initialize();
 
 	glutDisplayFunc(Display);
-	glutReshapeFunc(Redisplay);
+	glutReshapeFunc(ReDisplay);
 	glutKeyboardFunc(KeyboardController);
 	glutMouseFunc(MouseController);
 	glutMainLoop();
