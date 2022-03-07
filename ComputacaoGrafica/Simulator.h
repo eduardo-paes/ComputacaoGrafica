@@ -15,9 +15,10 @@ float Width = 800;
 float Height = 600;
 
 // Camera position
-float x = 0, y = 0;        // initially 5 units south of origin
-float sideMove = 0.0;      // get camera movement
+float x = 0, y = 0.2;
+float sideMove = 0.0;       // get camera movement
 float start = 0.0;          // start/stop car movement
+float rotateCar = 0.0;
 
 // Camera direction
 float lx = 0.0, ly = 1.0;   // camera points initially along y-axis
@@ -59,13 +60,13 @@ void RenderScene()
 
     // Draw scenario
     if (ScenarioModel.IsLoaded())
-        ScenarioModel.DisplayModel(MoveScenario);
+        ScenarioModel.DisplayModel(MoveScenario, 0);
     else
         ScenarioModel.LoadFromFile(ScenarioFile);
 
     // Draw car
     if (CarModel.IsLoaded())
-        CarModel.DisplayModel(MoveCar);
+        CarModel.DisplayModel(MoveCar, rotateCar);
     else
         CarModel.LoadFromFile(CarFile);
 }
@@ -93,16 +94,25 @@ void Reshape(int w, int h)
 void Update()
 {
     if (sideMove > 0) {
-        if (sideMove == 1) DeltaAngle -= 0.025;
-        else if (sideMove == 2) DeltaAngle += 0.025;
+        if (sideMove == 1) {
+            DeltaAngle -= 0.1;
+            //rotateCar = -15;
+        }
+        else if (sideMove == 2) {
+            DeltaAngle += 0.1;
+            //rotateCar = 15;
+        }
         lx = -sin(Angle + DeltaAngle);
         ly = cos(Angle + DeltaAngle);
     }
 
     // Update camera position
     if (start) {
-        x += start * lx * 0.1;
-        y += start * ly * 0.1;
+        x += start * lx * 0.2;
+        y += start * ly * 0.2;
+
+        MoveCar.x += start * lx * 0.2;
+        MoveCar.y += start * ly * 0.2;
     }
     
     // Redisplay everything
@@ -121,7 +131,7 @@ void Display()
     glLoadIdentity();
 
     // Definição da câmera
-    gluLookAt(x, y, 1, x + lx, y + ly, 1, 0, 0, 1);
+    gluLookAt(x, y, 0.85, x + lx, y + ly, 0.85, 0, 0, 1);
 
     // Draw complete scenario with car
     RenderScene();

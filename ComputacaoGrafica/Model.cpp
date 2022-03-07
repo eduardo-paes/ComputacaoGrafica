@@ -258,7 +258,7 @@ void Model::LoadFromFile(const char* fileName) {
 		}
 
 		isModelLoaded = true;
-		DisplayModel(Vertex());
+		DisplayModel(Vertex(), 0);
 	}
 	else {
 		cout << "Model file loading failed." << endl;
@@ -266,7 +266,7 @@ void Model::LoadFromFile(const char* fileName) {
 	}
 }
 
-void Model::DisplayModel(Vertex v) {
+void Model::DisplayModel(Vertex v, float angle) {
 	Normal norm;
 	Vertex v1, v2, v3;
 	string nameMatMap;
@@ -274,11 +274,6 @@ void Model::DisplayModel(Vertex v) {
 	char* mtlName;
 
 	for (auto values = mapMaterialFace.begin(); values != mapMaterialFace.end(); ++values) {
-
-		/*mtlName = (char*)values->first.c_str();
-		nameMatMap = GetConcatString(mtlName, "_Ks");
-		color = mapMaterialColor[nameMatMap];
-		glColor3ub(color.r, color.g, color.b);*/
 
 		mtlName = (char*)values->first.c_str();
 		color = GetObjectColor(mtlName);
@@ -292,12 +287,17 @@ void Model::DisplayModel(Vertex v) {
 			v3 = vertices[tmp.v2 == 0 ? tmp.v2 : tmp.v2 - 1];
 			norm = normals[tmp.vn0 == 0 ? tmp.vn0 : tmp.vn0 - 1];
 
+			glPushMatrix();
+			glRotatef(angle, 0, 0, 1);
+
 			glBegin(GL_TRIANGLES);
 			glVertex3f(v1.x + v.x, v1.y + v.y, v1.z + v.z);
 			glVertex3f(v2.x + v.x, v2.y + v.y, v2.z + v.z);
 			glVertex3f(v3.x + v.x, v3.y + v.y, v3.z + v.z);
 			glNormal3f(norm.x, norm.y, norm.z);
 			glEnd();
+
+			glPopMatrix();
 		}
 	}
 }

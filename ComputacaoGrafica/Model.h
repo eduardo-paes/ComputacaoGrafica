@@ -15,7 +15,7 @@ public:
 	~Model();
 
 	void LoadFromFile(const char* fileName);
-	void DisplayModel(Vertex v);
+	void DisplayModel(Vertex v, float angle);
 	bool IsLoaded();
 
 private:
