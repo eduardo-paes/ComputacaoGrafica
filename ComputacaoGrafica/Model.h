@@ -31,4 +31,5 @@ private:
 
 	void LoadMaterialFile(const char* fileName);
 	bool StartWith(string& line, const char* text);
+	Color GetObjectColor(string mtlName);
 };

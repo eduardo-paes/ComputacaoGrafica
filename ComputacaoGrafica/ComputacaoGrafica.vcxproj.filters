@@ -18,42 +18,18 @@
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Anima.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Bresenham.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Custom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Interacao.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Components.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SnowMan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CarCameraTest.h">
+    <ClInclude Include="Simulator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

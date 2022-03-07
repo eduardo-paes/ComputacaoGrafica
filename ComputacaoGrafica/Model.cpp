@@ -55,6 +55,65 @@ string GetConcatString(char* text1, string text2) {
 	return ss.str();
 }
 
+Color Model::GetObjectColor(string mtlName) {
+	if (StartWith(mtlName, "headlight")) {
+		return Color(255, 255, 255);
+	}
+	else if (StartWith(mtlName, "backlight")) {
+		return Color(255, 255, 255);
+	}
+	else if (StartWith(mtlName, "tire")) {
+		return Color(70, 70, 70);
+	}
+	else if (StartWith(mtlName, "spikes")) {
+		return Color(180, 180, 180);
+	}
+	else if (StartWith(mtlName, "windshield")) {
+		return Color();
+	}
+	else if (StartWith(mtlName, "carColorBlue")) {
+		return Color(22, 66, 163);
+	}
+	else if (StartWith(mtlName, "carColorBrown")) {
+		return Color(194, 116, 24);
+	}
+	else if (StartWith(mtlName, "carColorYellow")) {
+		return Color(237, 230, 50);
+	}
+	else if (StartWith(mtlName, "carColorPurple")) {
+		return Color(144, 91, 163);
+	}
+	else if (StartWith(mtlName, "carColorRed")) {
+		return Color(245, 0, 0);
+	}
+	else if (StartWith(mtlName, "trunk_color")) {
+		return Color(128, 101, 43);
+	}
+	else if (StartWith(mtlName, "branch_color1")) {
+		return Color(30, 128, 22);
+	}
+	else if (StartWith(mtlName, "branch_color2")) {
+		return Color(40, 161, 50);
+	}
+	else if (StartWith(mtlName, "branch_color3")) {
+		return Color(100, 161, 33);
+	}
+	else if (StartWith(mtlName, "Pista1")) {
+		return Color(140, 140, 140);
+	}
+	else if (StartWith(mtlName, "Pista2")) {
+		return Color(235, 235, 235);
+	}
+	else if (StartWith(mtlName, "Curva1")) {
+		return Color(140,140,140);
+	}
+	else if (StartWith(mtlName, "Curva2")) {
+		return Color(235, 235, 235);
+	}
+
+	return Color();
+}
+
 #pragma endregion
 
 #pragma region File_Loaders
@@ -221,7 +280,9 @@ void Model::DisplayModel(Vertex v) {
 		color = mapMaterialColor[nameMatMap];
 		glColor3ub(color.r, color.g, color.b);*/
 
-		glColor3ub(rand() % 255, rand() % 255, rand() % 255);
+		mtlName = (char*)values->first.c_str();
+		color = GetObjectColor(mtlName);
+		glColor3ub(color.r, color.g, color.b);
 
 		for (Face tmp : values->second) {
 			if (tmp.v0 == 0 && tmp.v1 == 0 && tmp.v2 == 0) continue;

@@ -1,6 +1,6 @@
-#include "CarCameraTest.h"
+#include "Simulator.h"
 
 int main(int argc, char** argv)
 {
-    return DisplayCarGame(argc, argv);
+    return StartSimulator(argc, argv);
 }

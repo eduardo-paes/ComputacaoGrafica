@@ -7,17 +7,17 @@
 
 #pragma region Global_Scope
 
-Vertex MoveObject = Vertex(0, 0, 0.5);
+Vertex MoveScenario = Vertex(0, 0, 0.5);
+Vertex MoveCar = Vertex(0, 0, 0.5);
 
 // Window Dimensions
 float Width = 800;
 float Height = 600;
 
 // Camera position
-float x = 0, y = -5;        // initially 5 units south of origin
+float x = 0, y = 0;        // initially 5 units south of origin
 float sideMove = 0.0;      // get camera movement
 float start = 0.0;          // start/stop car movement
-float centerZ = 1;
 
 // Camera direction
 float lx = 0.0, ly = 1.0;   // camera points initially along y-axis
@@ -30,7 +30,7 @@ int DragStartX = 0;         // records the x-coordinate when dragging starts
 
 // Filepaths
 const char* ScenarioFile = "./Models/Scenario.obj";
-const char* CarFile = "./Models/IndyCar.obj";
+const char* CarFile = "./Models/Car.obj";
 
 // Object Models
 Model ScenarioModel;
@@ -57,13 +57,17 @@ void RenderScene()
     glVertex3f(100.0, -100.0, 0.0);
     glEnd();
 
-    // Draw main car
-    if (CarModel.IsLoaded())
-        CarModel.DisplayModel(MoveObject);
+    // Draw scenario
+    if (ScenarioModel.IsLoaded())
+        ScenarioModel.DisplayModel(MoveScenario);
     else
-        CarModel.LoadFromFile(ScenarioFile);
+        ScenarioModel.LoadFromFile(ScenarioFile);
 
-    // TODO: Draw complete scenario
+    // Draw car
+    if (CarModel.IsLoaded())
+        CarModel.DisplayModel(MoveCar);
+    else
+        CarModel.LoadFromFile(CarFile);
 }
 
 #pragma endregion
@@ -89,8 +93,8 @@ void Reshape(int w, int h)
 void Update()
 {
     if (sideMove > 0) {
-        if (sideMove == 1) DeltaAngle -= 0.05;
-        else if (sideMove == 2) DeltaAngle += 0.05;
+        if (sideMove == 1) DeltaAngle -= 0.025;
+        else if (sideMove == 2) DeltaAngle += 0.025;
         lx = -sin(Angle + DeltaAngle);
         ly = cos(Angle + DeltaAngle);
     }
@@ -117,7 +121,7 @@ void Display()
     glLoadIdentity();
 
     // Definição da câmera
-    gluLookAt(x, y, 1, x + lx, y + ly, centerZ, 0, 0, 1);
+    gluLookAt(x, y, 1, x + lx, y + ly, 1, 0, 0, 1);
 
     // Draw complete scenario with car
     RenderScene();
@@ -133,8 +137,6 @@ void Display()
 void ProcessNormalKeys(unsigned char key, int xx, int yy)
 {
     if (key == ESC || key == 'q' || key == 'Q') exit(0);
-    if (key == 'w') centerZ += 0.1;
-    if (key == 's') centerZ -= 0.1;
 }
 
 void PressSpecialKey(int key, int xx, int yy)
@@ -191,7 +193,7 @@ void MouseButton(int button, int state, int x, int y)
 
 #pragma region Main_Method
 
-int DisplayCarGame(int argc, char** argv)
+int StartSimulator(int argc, char** argv)
 {
     // General initializations
     glutInit(&argc, argv);
