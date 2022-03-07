@@ -38,7 +38,7 @@ void Initialize(void)
 }
 
 // Função callback chamada quando o tamanho da janela é alterado 
-void Redisplay(GLsizei w, GLsizei h)
+void Reshape(GLsizei w, GLsizei h)
 {
     // Especifica as dimensões da Viewport
     glViewport(0, 0, w, h);
@@ -72,7 +72,7 @@ void KeyboardController(unsigned char key, int x, int y)
 }
 
 // Função callback chamada para gerenciar eventos do mouse
-void MouseController(int button, int state, int x, int y)
+void MouseButton(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON)
         if (state == GLUT_DOWN) {
@@ -111,9 +111,9 @@ int Interacao(void)
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Exemplo de Interacao");
     glutDisplayFunc(Display);
-    glutReshapeFunc(Redisplay);
+    glutReshapeFunc(Reshape);
     glutKeyboardFunc(KeyboardController);
-    glutMouseFunc(MouseController);
+    glutMouseFunc(MouseButton);
     glutSpecialFunc(TeclasEspeciais);
     Initialize();
     glutMainLoop();

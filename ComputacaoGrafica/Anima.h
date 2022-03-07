@@ -87,7 +87,7 @@ void Initialize(void)
 }
 
 // Função callback chamada quando o tamanho da janela é alterado 
-void ReDisplay(GLsizei w, GLsizei h)
+void Reshape(GLsizei w, GLsizei h)
 {
     // Evita a divisao por zero
     if (h == 0) h = 1;
@@ -120,7 +120,7 @@ int Anima(void)
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Anima");
     glutDisplayFunc(Display);
-    glutReshapeFunc(ReDisplay);
+    glutReshapeFunc(Reshape);
     glutTimerFunc(33, Timer, 1);
     Initialize();
     glutMainLoop();

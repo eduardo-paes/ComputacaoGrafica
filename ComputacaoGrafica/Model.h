@@ -1,6 +1,5 @@
 #include <map>
 #include <string>
-#include <gl/glut.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,7 +15,7 @@ public:
 	~Model();
 
 	void LoadFromFile(const char* fileName);
-	void DisplayModel();
+	void DisplayModel(Vertex v);
 	bool IsLoaded();
 
 private:
@@ -24,6 +23,7 @@ private:
 	vector<Normal> normals;
 	vector<Texture> textures;
 	vector<Space> spaces;
+	vector<char*> materials;
 	map<string, vector<Face>> mapMaterialFace;
 	map<string, Color> mapMaterialColor;
 	GLuint list;
@@ -31,8 +31,4 @@ private:
 
 	void LoadMaterialFile(const char* fileName);
 	bool StartWith(string& line, const char* text);
-	void AddVertex(Vertex vertex);
-	void AddNormal(Normal normal);
-	void AddTexture(Texture texture);
-	void AddSpace(Space space);
 };

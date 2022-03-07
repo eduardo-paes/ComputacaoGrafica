@@ -1,5 +1,6 @@
 #include"Camera.h"
-#include <stdio.h>
+
+float speed = 1;
 
 Camera::Camera(GLdouble eyeX,	 GLdouble eyeY,		GLdouble eyeZ,
 			   GLdouble centerX, GLdouble centerY,  GLdouble centerZ,
@@ -14,6 +15,7 @@ Camera::Camera(GLdouble eyeX,	 GLdouble eyeY,		GLdouble eyeZ,
 	this->upX = upX;
 	this->upY = upY;
 	this->upZ = upZ;
+	this->angleRotation = 0;
 }
 
 void Camera::Print() {
@@ -23,25 +25,22 @@ void Camera::Print() {
 }
 
 void Camera::MoveForward() {
-	this->eyeY += 5;
-	this->eyeZ += 5;
-	this->centerY += 5;
-	this->centerZ += 5;
+	this->eyeZ -= speed;
 }
 
 void Camera::MoveBack() {
-	this->eyeY -= 5;
-	this->eyeZ -= 5;
-	this->centerY -= 5;
-	this->centerZ -= 5;
-}
-
-void Camera::MoveRight() {
-	this->eyeX += 5;
-	this->centerX += 5;
+	this->eyeZ += speed;
 }
 
 void Camera::MoveLeft() {
-	this->eyeX -= 5;
-	this->centerX -= 5;
+	this->eyeX -= speed;
+}
+
+void Camera::MoveRight() {
+	this->eyeX += speed;
+}
+
+void Camera::HorizontalMoviment(float lx, float ly) {
+	this->centerX = this->eyeX + lx;
+	this->centerY = this->eyeY + ly;
 }

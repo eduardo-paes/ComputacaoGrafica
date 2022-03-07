@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Custom.h"
 
-float width = 640.0;
+float Width = 640.0;
 float heigth = 480.0;
 
 /// <summary>
@@ -13,7 +13,7 @@ void Init(void)
 	glClearColor(1.0, 1.0, 1.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0.0, width, 0.0, heigth);
+	gluOrtho2D(0.0, Width, 0.0, heigth);
 }
 
 /// <summary>
@@ -42,7 +42,7 @@ void Display()
 int Bresenham(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitWindowSize(width, heigth);
+	glutInitWindowSize(Width, heigth);
 	glutInitWindowPosition(10, 10);
 	glutCreateWindow("Algoritmo de Retas Simples com Bresenham");
 	Init();

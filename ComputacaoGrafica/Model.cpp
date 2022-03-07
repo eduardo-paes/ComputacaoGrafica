@@ -57,14 +57,9 @@ string GetConcatString(char* text1, string text2) {
 
 #pragma endregion
 
-#pragma region File_Loaders_Public
+#pragma region File_Loaders
 
 void Model::LoadFromFile(const char* fileName) {
-	vector<Vertex> vertices;
-    vector<Normal> normals;
-    vector<Texture> textures;
-    vector<Space> params;
-
 	ifstream file(fileName);
 	if (file) {
 		char currentMtlName[100];
@@ -79,14 +74,6 @@ void Model::LoadFromFile(const char* fileName) {
 				char mtlFileName[100];
 				(void)sscanf_s(line.c_str(), "mtllib %s", mtlFileName, sizeof(mtlFileName));
 				LoadMaterialFile(mtlFileName);
-			}
-
-            // VERTEX: List of geometric vertices, with (x, y, z [,w]) coordinates, w is optional and defaults to 1.
-			else if (StartWith(line, "v")) {
-				Vertex v = Vertex();
-				(void)sscanf_s(line.c_str(), "v %f %f %f", &v.x, &v.y, &v.z);
-				Model::AddVertex(v);
-				vertices.push_back(v);
 			}
 
             // NORMAL: List of vertex normals in (x,y,z) form; normals might not be unit vectors.
@@ -114,22 +101,30 @@ void Model::LoadFromFile(const char* fileName) {
             // SPACE: Parameter space vertices in ( u [,v] [,w] ) form; free form geometry statement.
             else if (StartWith(line, "vp")) {
                 Space s = Space();
-                int spaces = CountChar(line, ' ');
+                int blankSpace = CountChar(line, ' ');
 
-                if (spaces == 1)
+                if (blankSpace == 1)
                     (void)sscanf_s(line.c_str(), "vp %f", &s.u);
-                else if (spaces == 2)
+                else if (blankSpace == 2)
                     (void)sscanf_s(line.c_str(), "vp %f %f", &s.u, &s.v);
                 else
                     (void)sscanf_s(line.c_str(), "vp %f %f %f", &s.u, &s.v, &s.w);
 
-                params.push_back(s);
+				spaces.push_back(s);
             }
+
+            // VERTEX: List of geometric vertices, with (x, y, z [,w]) coordinates, w is optional and defaults to 1.
+			else if (StartWith(line, "v")) {
+				Vertex v = Vertex();
+				(void)sscanf_s(line.c_str(), "v %f %f %f", &v.x, &v.y, &v.z);
+				vertices.push_back(v);
+			}
 
             // MATERIAL_NAME: This tag specifies the material name for the element following it. 
             // The material name matches a named material definition in an external .mtl file.
 			else if (StartWith(line, "usemtl")) {
 				(void)sscanf_s(line.c_str(), "usemtl %s", currentMtlName, sizeof(currentMtlName));
+				materials.push_back(currentMtlName);
 			}
 
             // FACES: Polygonal face elements
@@ -204,6 +199,7 @@ void Model::LoadFromFile(const char* fileName) {
 		}
 
 		isModelLoaded = true;
+		DisplayModel(Vertex());
 	}
 	else {
 		cout << "Model file loading failed." << endl;
@@ -211,17 +207,43 @@ void Model::LoadFromFile(const char* fileName) {
 	}
 }
 
-void Model::DisplayModel() {
-	// TODO: Draw model on screen.
+void Model::DisplayModel(Vertex v) {
+	Normal norm;
+	Vertex v1, v2, v3;
+	string nameMatMap;
+	Color color;
+	char* mtlName;
+
+	for (auto values = mapMaterialFace.begin(); values != mapMaterialFace.end(); ++values) {
+
+		/*mtlName = (char*)values->first.c_str();
+		nameMatMap = GetConcatString(mtlName, "_Ks");
+		color = mapMaterialColor[nameMatMap];
+		glColor3ub(color.r, color.g, color.b);*/
+
+		glColor3ub(rand() % 255, rand() % 255, rand() % 255);
+
+		for (Face tmp : values->second) {
+			if (tmp.v0 == 0 && tmp.v1 == 0 && tmp.v2 == 0) continue;
+
+			v1 = vertices[tmp.v0 == 0 ? tmp.v0 : tmp.v0 - 1];
+			v2 = vertices[tmp.v1 == 0 ? tmp.v1 : tmp.v1 - 1];
+			v3 = vertices[tmp.v2 == 0 ? tmp.v2 : tmp.v2 - 1];
+			norm = normals[tmp.vn0 == 0 ? tmp.vn0 : tmp.vn0 - 1];
+
+			glBegin(GL_TRIANGLES);
+			glVertex3f(v1.x + v.x, v1.y + v.y, v1.z + v.z);
+			glVertex3f(v2.x + v.x, v2.y + v.y, v2.z + v.z);
+			glVertex3f(v3.x + v.x, v3.y + v.y, v3.z + v.z);
+			glNormal3f(norm.x, norm.y, norm.z);
+			glEnd();
+		}
+	}
 }
 
 bool Model::IsLoaded() {
 	return isModelLoaded;
 }
-
-#pragma endregion
-
-#pragma region File_Loaders_Private
 
 void Model::LoadMaterialFile(const char* fileName) {
 	ostringstream ss;
@@ -290,22 +312,6 @@ void Model::LoadMaterialFile(const char* fileName) {
 	else {
 		cout << "Material file loading failed." << endl;
 	}
-}
-
-void Model::AddVertex(Vertex v) {
-	vertices.push_back(v);
-}
-
-void Model::AddNormal(Normal n) {
-	normals.push_back(n);
-}
-
-void Model::AddTexture(Texture t) {
-	textures.push_back(t);
-}
-
-void Model::AddSpace(Space s) {
-	spaces.push_back(s);
 }
 
 #pragma endregion

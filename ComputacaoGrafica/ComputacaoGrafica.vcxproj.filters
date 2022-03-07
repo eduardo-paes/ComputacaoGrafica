@@ -50,5 +50,11 @@
     <ClInclude Include="Components.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SnowMan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CarCameraTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

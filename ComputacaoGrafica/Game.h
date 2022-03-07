@@ -7,94 +7,127 @@
 
 #pragma region Global_Escope
 
-GLfloat angle, fAspect;
-GLfloat r = 0, g = 0, b = 1;
-GLsizei width = 600, height = 600;
-int POS_X, POS_Y;
+#define ESC 27
+
+// Camera position
+float x = 0.0, y = -5.0;	// initially 5 units south of origin
+int sideMove = 0;			// initially camera doesn't move
+
+// Camera direction
+float lx = 0.0, ly = 1.0;	// camera points initially along y-axis
+float Angle = 0.0;			// angle of rotation for the camera direction
+float DeltaAngle = 0.0;		// additional angle change when dragging
+
+// Mouse drag control
+int IsDragging = 0;			// true when dragging
+int DragStartX = 0;			// records the x-coordinate when dragging starts
+
+GLfloat Ratio = 0.0;
+GLsizei Width = 600, Height = 600;
 
 // Parâmetros de câmera
-Camera mainCamera = Camera(0, 80, 200, 0, 0, 0, 0, 1, 0);
-Camera backCamera = Camera(0, -80, 200, 0, 0, 0, 0, 1, 0);
-Camera mapCamera = Camera(0, -115, 5, 0, 195, 0, 0, 1, 0);
+Camera MainCamera = Camera(0, 0, 11, 0, 1, 1, 0, 0, 1);
+Camera BackCamera = Camera(0, -80, 200, 0, 0, 0, 0, 1, 0);
+Camera MapCamera = Camera(0, -115, 5, 0, 195, 0, 0, 1, 0);
 
 // Filepaths
-const char* CubeFile = "./Models/Car1.obj";
+const char* ScenarioFile = "./Models/Car1.obj";
+const char* CarFile = "./Models/Car1.obj";
 
 // Object Models
-Model cube;
+Model ScenarioModel;
+Model CarModel;
 
 #pragma endregion
 
 #pragma region Assign_Methods
 
-void EspecifyDisplayParameters();
 void DefineCamera(GLsizei iniW, GLsizei iniH, GLsizei sizeW, GLsizei sizeH, Camera cam);
-void MainCamera();
-void BackCamera();
-void MapCamera();
-void ScrollController(int, int, int, int);
+void DefineMainCamera();
+void DefineBackCamera();
+void DefineMapCamera();
 
 #pragma endregion
+
+#pragma region Display_Methods
 
 /// <summary>
 /// Função callback chamada para fazer o desenho.
 /// </summary>
 void Display(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	// Sky color is light blue
+	glClearColor(0.0, 0.7, 1.0, 1.0); 
+
+	// Clear color and depth buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Desenho dos cenários
-	MainCamera();
-	BackCamera();
-	MapCamera();
+	DefineMainCamera();
+	DefineBackCamera();
+	DefineMapCamera();
 
 	// Executa os comandos OpenGL
 	glutSwapBuffers();
 }
 
-void MainCamera()
+/// <summary>
+/// Função callback chamada quando o tamanho da janela é alterado.
+/// </summary>
+/// <param name="w">Width da chamada</param>
+/// <param name="h">Height da chamada</param>
+void Reshape(GLsizei w, GLsizei h)
 {
-	// Definição da viewport e câmera 1
-	DefineCamera(0, 0, width, height, mainCamera);
+	// Para previnir uma divisão por zero
+	if (h == 0) h = 1;
 
-	// Desenha o teapot com a cor corrente (wire-frame)
-	/*glColor3f(r, g, b);
-	glutWireTeapot(50.0f);*/
+	// Guarda valores de Largura e Altura globalmente
+	Width = w;
+	Height = h;
 
-	// Desenha o carro principal
-	if (cube.IsLoaded())
-		cube.DisplayModel();
-	else
-		cube.LoadFromFile(CubeFile);
+	float ratio = ((float)w) / ((float)h);		// window aspect ratio
+	glMatrixMode(GL_PROJECTION);				// projection matrix is active
+	glLoadIdentity();							// reset the projection
+	gluPerspective(45.0, ratio, 0.1, 100.0);	// perspective transformation
+	glMatrixMode(GL_MODELVIEW);					// return to modelview mode
 }
 
-void BackCamera()
+#pragma endregion
+
+#pragma region Cameras_Definition
+
+void DefineMainCamera()
+{
+	MainCamera.Print();
+
+	// Definição da viewport e câmera 1
+	DefineCamera(0, 0, Width, Height, MainCamera);
+
+	// Desenha o carro principal
+	if (ScenarioModel.IsLoaded())
+		ScenarioModel.DisplayModel();
+	else
+		ScenarioModel.LoadFromFile(ScenarioFile);
+}
+
+void DefineBackCamera()
 {
 	// Definição da viewport e câmera 2
-	DefineCamera(0, 0, width / 8, height / 8, backCamera);
+	DefineCamera(0, 0, Width / 8, Height / 8, BackCamera);
 
 	// Desenha o teapot com a cor corrente (wire-frame)
 	glColor3f(0,1,0);
 	glutWireTeapot(50.0f);
 }
 
-void MapCamera()
+void DefineMapCamera()
 {
 	// Definição da viewport e câmera 3
-	DefineCamera(width - (width / 8), 0, width / 8, height / 8, mapCamera);
+	DefineCamera(Width - (Width / 8), 0, Width / 8, Height / 8, MapCamera);
 
 	// Desenha o teapot com a cor corrente (wire-frame)
 	glColor3f(1,0,0);
 	glutWireTeapot(50.0f);
-}
-
-/// <summary>
-/// Inicializa parâmetros de rendering.
-/// </summary>
-void Initialize(void)
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	angle = 90;
 }
 
 /// <summary>
@@ -118,45 +151,22 @@ void DefineCamera(GLsizei iniW, GLsizei iniH, GLsizei sizeW, GLsizei sizeH, Came
 			  cam.upX,		cam.upY,		cam.upZ);
 }
 
-/// <summary>
-/// Função usada para especificar o volume de visualização.
-/// </summary>
-void EspecifyDisplayParameters()
+#pragma endregion
+
+#pragma region Mouse_Methods
+
+void MouseMove(int x, int y)
 {
-	// Especifica sistema de coordenadas de projeção
-	glMatrixMode(GL_PROJECTION);
+	if (IsDragging) {
+		// update the change in angle
+		DeltaAngle = (x - DragStartX) * 0.005;
 
-	// Inicializa sistema de coordenadas de projeção
-	glLoadIdentity();
+		// camera's direction is set to angle + deltaAngle
+		lx = -sin(Angle + DeltaAngle);
+		ly = cos(Angle + DeltaAngle);
 
-	// Especifica a projeção perspectiva
-	gluPerspective(angle, fAspect, 0.5, 500);
-
-	// Especifica sistema de coordenadas do modelo
-	glMatrixMode(GL_MODELVIEW);
-
-	// Inicializa sistema de coordenadas do modelo
-	glLoadIdentity();
-}
-
-/// <summary>
-/// Função callback chamada quando o tamanho da janela é alterado.
-/// </summary>
-/// <param name="w">Width da chamada</param>
-/// <param name="h">Height da chamada</param>
-void ReDisplay(GLsizei w, GLsizei h)
-{
-	// Para previnir uma divisão por zero
-	if (h == 0) h = 1;
-
-	// Define globalmente as dimensões
-	width = w;
-	height = h;
-
-	// Calcula a correção de aspecto
-	fAspect = (GLfloat)width / (GLfloat)height;
-
-	EspecifyDisplayParameters();
+		MainCamera.HorizontalMoviment(Angle, DeltaAngle);
+	}
 }
 
 /// <summary>
@@ -166,87 +176,84 @@ void ReDisplay(GLsizei w, GLsizei h)
 /// <param name="state"></param>
 /// <param name="x"></param>
 /// <param name="y"></param>
-void MouseController(int button, int state, int x, int y)
+void MouseButton(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON)
-		if (state == GLUT_DOWN)  // Zoom-in
-			if (angle >= 10) angle -= 5;
-	if (button == GLUT_RIGHT_BUTTON)
-		if (state == GLUT_DOWN)  // Zoom-out
-			if (angle <= 130) angle += 5;
-
-	EspecifyDisplayParameters();
-	glutPostRedisplay();
+	if (button == GLUT_LEFT_BUTTON) {
+		// Left mouse button pressed
+		if (state == GLUT_DOWN) { 
+			IsDragging = 1;			// start dragging
+			DragStartX = x;			// save x where button first pressed
+		}
+		// When state = GLUT_UP
+		else { 
+			Angle += DeltaAngle;	// update camera turning angle
+			IsDragging = 0;			// no longer dragging
+		}
+	}
 }
 
-void ScrollController(int button, int dir, int x, int y)
-{
-	// Zoom in
-	if (dir > 0)
-		if (angle >= 10) angle -= 5;
-	// Zoom out
-	else
-		if (angle <= 130) angle += 5;
+#pragma endregion
 
-	return;
+#pragma region Keyboard_Methods
+
+void ProcessNormalKeys(unsigned char key, int xx, int yy)
+{
+	if (key == ESC || key == 'q' || key == 'Q') exit(0);
+	if (key == ' ') MainCamera = Camera(0, 0, 11, 0, 1, 1, 0, 0, 1);
 }
 
-/// <summary>
-/// Função callback chamada para gerenciar eventos de teclado.
-/// </summary>
-/// <param name="key"></param>
-/// <param name="x"></param>
-/// <param name="y"></param>
-void KeyboardController(unsigned char key, int x, int y)
+void PressSpecialKey(int key, int xx, int yy)
 {
 	switch (key) {
-		// Muda a cor corrente para vermelho
-		case 'R':
-		case 'r':
-			r = 1;
-			g = 0;
-			b = 0;
-			break;
-		// Muda a cor corrente para verde
-		case 'G':
-		case 'g':
-			r = 0;
-			g = 1;
-			b = 0;
-			break;
-		// Muda a cor corrente para azul
-		case 'B':
-		case 'b':
-			r = 0;
-			g = 0;
-			b = 1;
-			break;
-		// Cima
-		case 'W':
-		case 'w':
-			mainCamera.MoveForward();
-			break;
-		// Baixo
-		case 'S':
-		case 's':
-			mainCamera.MoveBack();
-			break;
-		// Esquerda
-		case 'A':
-		case 'a':
-			mainCamera.MoveLeft();
-			break;
-		// Direita
-		case 'D':
-		case 'd':
-			mainCamera.MoveRight();
-			break;
-		// Reset
-		case ' ':
-			mainCamera = Camera(0, 80, 200, 0, 0, 0, 0, 1, 0);
-			break;
+		case GLUT_KEY_UP: sideMove = 1; break;
+		case GLUT_KEY_DOWN: sideMove = 2; break;
+		case GLUT_KEY_RIGHT: sideMove = 3; break;
+		case GLUT_KEY_LEFT: sideMove = 4; break;
 	}
-	mainCamera.Print();
+}
+
+void ReleaseSpecialKey(int key, int x, int y)
+{
+	switch (key) {
+	case GLUT_KEY_UP: sideMove = 0; break;
+	case GLUT_KEY_DOWN: sideMove = 0; break;
+	case GLUT_KEY_RIGHT: sideMove = 0; break;
+	case GLUT_KEY_LEFT: sideMove = 0; break;
+	}
+}
+
+#pragma endregion
+
+void Update(void)
+{	
+	switch (sideMove) {
+	// Forward
+	case 1:
+		MainCamera.MoveForward();
+		break;
+	// Back
+	case 2:
+		MainCamera.MoveBack();
+		break;
+	// Right
+	case 3:
+		MainCamera.MoveRight();
+		DeltaAngle -= 0.05;
+		lx = -sin(Angle + DeltaAngle);
+		ly = cos(Angle + DeltaAngle);
+		MainCamera.HorizontalMoviment(lx, ly);
+		break;
+	// Left
+	case 4:
+		MainCamera.MoveLeft();
+		DeltaAngle += 0.05;
+		lx = -sin(Angle + DeltaAngle);
+		ly = cos(Angle + DeltaAngle);
+		MainCamera.HorizontalMoviment(lx, ly);
+		break;
+	}
+
+	// Redisplay everything
 	glutPostRedisplay();
 }
 
@@ -257,24 +264,26 @@ void KeyboardController(unsigned char key, int x, int y)
 int Game(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
-	glEnable(GLUT_MULTISAMPLE);
-	glHint(GLUT_MULTISAMPLE, GL_NICEST);
-	POS_X = (glutGet(GLUT_SCREEN_WIDTH) - width) >> 1;
-	POS_Y = (glutGet(GLUT_SCREEN_HEIGHT) - height) >> 1;
-	glutInitWindowPosition(POS_X, POS_Y);
-
-	glutInitWindowSize(width, height);
-	glutCreateWindow("Visualizacao 3D");
-
-	Initialize();
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(600, 600);
+	glutCreateWindow("F1 Driving Simulator");
 
 	glutDisplayFunc(Display);
-	glutReshapeFunc(ReDisplay);
-	glutKeyboardFunc(KeyboardController);
-	glutMouseFunc(MouseController);
+	glutReshapeFunc(Reshape);
+	glutIdleFunc(Update);
+	glutIgnoreKeyRepeat(1);                 // ignore key repeat when holding key down
+	glutMouseFunc(MouseButton);             // process mouse button push/release
+	glutMotionFunc(MouseMove);              // process mouse dragging motion
+	glutKeyboardFunc(ProcessNormalKeys);    // process standard key clicks
+	glutSpecialFunc(PressSpecialKey);       // process special key pressed
+	glutSpecialUpFunc(ReleaseSpecialKey);   // process special key release
+
+	// OpenGL init
+	glEnable(GL_DEPTH_TEST);
+
+	// enter GLUT event processing cycle
 	glutMainLoop();
 
-	return 0;
+	return 0; // this is just to keep the compiler happy
 }

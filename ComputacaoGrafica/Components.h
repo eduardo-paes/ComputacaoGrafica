@@ -1,4 +1,5 @@
 #include <vector>
+#include <gl/glut.h>
 
 class Color {
 public:
@@ -26,13 +27,18 @@ public:
 
 class Vertex {
 public:
-	float x;
-	float y;
-	float z;
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
 	Vertex() {
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
+	}
+	Vertex(GLfloat x, GLfloat y, GLfloat z) {
+		this->x = x;
+		this->y = y;
+		this->z = z;
 	}
 };
 

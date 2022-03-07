@@ -183,11 +183,13 @@
   <ItemGroup>
     <ClInclude Include="Anima.h" />
     <ClInclude Include="Bresenham.h" />
+    <ClInclude Include="CarCameraTest.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="Custom.h" />
     <ClInclude Include="Interacao.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="SnowMan.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
