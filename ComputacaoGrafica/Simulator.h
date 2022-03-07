@@ -49,6 +49,22 @@ void RenderSky() {
 
 void RenderScene()
 {
+    // Set light parameters
+    const GLfloat Pos[] = { 1., 1., 1., 1. };
+    const GLfloat Ambient[] = { 0.6, 0.6, 0.6, 0.6 };
+    const GLfloat Diffuse[] = { 0.4, 0.4, 0.4, 0.4 };
+
+    glEnable(GL_DEPTH);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT0, GL_POSITION, Pos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, Ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, Diffuse);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // Draw ground - 200x200 square colored green
     glColor3f(0.0, 0.2, 0.0);
     glBegin(GL_QUADS);
@@ -222,8 +238,6 @@ int StartSimulator(int argc, char** argv)
     glutKeyboardFunc(ProcessNormalKeys);    // process standard key clicks
     glutSpecialFunc(PressSpecialKey);       // process special key pressed
     glutSpecialUpFunc(ReleaseSpecialKey);   // process special key release
-
-    glEnable(GL_DEPTH_TEST);
     glutMainLoop();
     
     return 0; 

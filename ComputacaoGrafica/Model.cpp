@@ -288,14 +288,14 @@ void Model::DisplayModel(Vertex v, float angle) {
 			norm = normals[tmp.vn0 == 0 ? tmp.vn0 : tmp.vn0 - 1];
 
 			glPushMatrix();
-			glRotatef(angle, 0, 0, 1);
+				glRotatef(angle, 0.0, 0.0, 1.0);
 
-			glBegin(GL_TRIANGLES);
-			glVertex3f(v1.x + v.x, v1.y + v.y, v1.z + v.z);
-			glVertex3f(v2.x + v.x, v2.y + v.y, v2.z + v.z);
-			glVertex3f(v3.x + v.x, v3.y + v.y, v3.z + v.z);
-			glNormal3f(norm.x, norm.y, norm.z);
-			glEnd();
+				glBegin(GL_TRIANGLES);
+				glVertex3f(v1.x + v.x, v1.y + v.y, v1.z + v.z);
+				glVertex3f(v2.x + v.x, v2.y + v.y, v2.z + v.z);
+				glVertex3f(v3.x + v.x, v3.y + v.y, v3.z + v.z);
+				glNormal3f(norm.x, norm.y, norm.z);
+				glEnd();
 
 			glPopMatrix();
 		}
