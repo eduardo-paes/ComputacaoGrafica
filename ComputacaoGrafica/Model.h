@@ -32,4 +32,5 @@ private:
 	void LoadMaterialFile(const char* fileName);
 	bool StartWith(string& line, const char* text);
 	Color GetObjectColor(string mtlName);
+	Vertex RotateVertex(float angle, Vertex v1, Vertex v2);
 };

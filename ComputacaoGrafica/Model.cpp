@@ -110,8 +110,15 @@ Color Model::GetObjectColor(string mtlName) {
 	else if (StartWith(mtlName, "Curva2")) {
 		return Color(235, 235, 235);
 	}
-
 	return Color();
+}
+
+Vertex Model::RotateVertex(float angle, Vertex v1, Vertex v2) {
+	float x = v1.x;
+	float y = v1.y;
+	float z = v1.z;
+
+	return Vertex(x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle), z);
 }
 
 #pragma endregion
@@ -250,11 +257,6 @@ void Model::LoadFromFile(const char* fileName) {
 				// Insert Face in the current Material
 				mapMaterialFace[currentMtlName].push_back(val);
 			}
-
-            // LINES: Line element
-            else if (StartWith(line, "l")) {
-                // TODO: Check how to implement it.
-            }
 		}
 
 		isModelLoaded = true;
@@ -269,16 +271,15 @@ void Model::LoadFromFile(const char* fileName) {
 void Model::DisplayModel(Vertex v, float angle) {
 	Normal norm;
 	Vertex v1, v2, v3;
-	string nameMatMap;
 	Color color;
 	char* mtlName;
 
 	for (auto values = mapMaterialFace.begin(); values != mapMaterialFace.end(); ++values) {
-
 		mtlName = (char*)values->first.c_str();
 		color = GetObjectColor(mtlName);
 		glColor3ub(color.r, color.g, color.b);
 
+		glPushMatrix();
 		for (Face tmp : values->second) {
 			if (tmp.v0 == 0 && tmp.v1 == 0 && tmp.v2 == 0) continue;
 
@@ -287,18 +288,20 @@ void Model::DisplayModel(Vertex v, float angle) {
 			v3 = vertices[tmp.v2 == 0 ? tmp.v2 : tmp.v2 - 1];
 			norm = normals[tmp.vn0 == 0 ? tmp.vn0 : tmp.vn0 - 1];
 
-			glPushMatrix();
-				glRotatef(angle, 0.0, 0.0, 1.0);
+			if (angle != 0) {
+				v1 = RotateVertex(angle, v1, v);
+				v2 = RotateVertex(angle, v2, v);
+				v3 = RotateVertex(angle, v3, v);
+			}
 
-				glBegin(GL_TRIANGLES);
-				glVertex3f(v1.x + v.x, v1.y + v.y, v1.z + v.z);
-				glVertex3f(v2.x + v.x, v2.y + v.y, v2.z + v.z);
-				glVertex3f(v3.x + v.x, v3.y + v.y, v3.z + v.z);
-				glNormal3f(norm.x, norm.y, norm.z);
-				glEnd();
-
-			glPopMatrix();
+			glBegin(GL_TRIANGLES);
+			glVertex3f(v1.x + v.x, v1.y + v.y, v1.z + v.z);
+			glVertex3f(v2.x + v.x, v2.y + v.y, v2.z + v.z);
+			glVertex3f(v3.x + v.x, v3.y + v.y, v3.z + v.z);
+			glNormal3f(norm.x, norm.y, norm.z);
+			glEnd();
 		}
+		glPopMatrix();
 	}
 }
 
