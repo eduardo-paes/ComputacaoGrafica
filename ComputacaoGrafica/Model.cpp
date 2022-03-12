@@ -1,4 +1,8 @@
+#pragma region Imports
+
 #include "Model.h"
+
+#pragma endregion
 
 #pragma region Constructors
 
@@ -55,7 +59,7 @@ string GetConcatString(char* text1, string text2) {
 	return ss.str();
 }
 
-Color Model::GetObjectColor(string mtlName) {
+Model::Color Model::GetObjectColor(string mtlName) {
 	if (StartWith(mtlName, "headlight")) {
 		return Color(255, 255, 255);
 	}
@@ -113,7 +117,7 @@ Color Model::GetObjectColor(string mtlName) {
 	return Color();
 }
 
-Vertex Model::RotateVertex(float angle, Vertex v1, Vertex v2) {
+Model::Vertex Model::RotateVertex(float angle, Vertex v1, Vertex v2) {
 	float x = v1.x;
 	float y = v1.y;
 	float z = v1.z;
